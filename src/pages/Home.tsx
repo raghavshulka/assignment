@@ -6,34 +6,28 @@ import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
 
 const Home = () => {
-  interface type {
-    id: String;
+  interface DataType {
+    id: string;
     title: string;
     body: string;
   }
 
-  const [datas, setDatas] = useState<type>({
-    id: "",
-    title: "",
-    body: "",
-  });
+  const [datas, setDatas] = useState<DataType[]>([]);
 
-  const getData: any = async () => {
-    await axios
-      .get("https://jsonplaceholder.typicode.com/posts")
-      .catch((err) => {
-        console.error(err);
-      })
-      .then((res) => {
-        const data = res.data;
-        setDatas(data);
-      });
+  const getData = async () => {
+    try {
+      const response = await axios.get<DataType[]>("https://jsonplaceholder.typicode.com/posts");
+      setDatas(response.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
+
   useEffect(() => {
     getData();
   }, []);
 
-  const columns: GridColDef<(typeof rows)[type]>[] = [
+  const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 300 },
     {
       field: "title",
@@ -57,6 +51,7 @@ const Home = () => {
         <DataGrid
           rows={rows}
           columns={columns}
+          getRowId={(row) => row.id}
           initialState={{
             pagination: {
               paginationModel: {
@@ -71,7 +66,9 @@ const Home = () => {
       </Box>
 
       <Link to={"/task"}>
-        <Button sx={{ margin:'20px'}} variant="outlined"> Task2</Button>
+        <Button sx={{ margin: "20px" }} variant="outlined">
+          Task2
+        </Button>
       </Link>
     </>
   );
